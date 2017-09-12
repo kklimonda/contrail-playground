@@ -1,0 +1,83 @@
+- hosts: 'localhost'
+  connection: local
+  tasks:
+  - name: Install Mirantis MK apt key
+    apt_key: url=http://apt-mk.mirantis.com/public.gpg state=present
+    become: true
+    become_user: root
+  - name: Add Mirantis MK dependencies repository
+    apt_repository: repo="deb http://apt-mk.mirantis.com/xenial/ nightly extra"
+    become: true
+    become_user: root
+  - name: Install base packages to support building
+    apt: name={{ item }} state=installed
+    with_items:
+    - devscripts
+    - equivs
+    - libxml2-utils
+    become: true
+    become_user: root
+  - name: configure git
+    shell: git config --global {{ item.name }} "{{ item.value }}"
+    with_items:
+      - { name: user.name, value: Contrail Builder }
+      - { name: user.email, value: builder@local }
+  - name: Install google repo
+    get_url: |
+      url=https://storage.googleapis.com/git-repo-downloads/repo
+      dest=/usr/local/bin/repo mode='0755'
+    become: true
+    become_user: root
+  - name: Create /home/ubuntu/contrail/
+    file: dest=/home/ubuntu/contrail state=directory
+  - name: Initialize contrail-vnc repo
+    shell: repo init -u https://github.com/kklimonda/contrail-vnc/ -m default.xml
+    args:
+      chdir: /home/ubuntu/contrail/
+      creates: /home/ubuntu/contrail/.repo/
+  - name: Refresh repositories
+    shell: repo sync
+    args:
+      chdir: /home/ubuntu/contrail/
+  - name: Add gerrit remotes to repositories
+    shell: git remote add gerrit https://review.opencontrail.org/Juniper/{{ item.repo }}
+    args:
+      chdir: /home/ubuntu/contrail/{{ item.path }}
+    failed_when: false
+    with_items:
+      - { path: controller, repo: contrail-controller }
+      - { path: tools/build, repo: contrail-build }
+    register: gerrit_remote
+  - name: Fetch gerrit remote
+    shell: git fetch --all
+    args:
+      chdir: /home/ubuntu/contrail/{{ item }}
+    when: gerrit_remote.changed
+    with_items:
+      - controller
+      - tools/build
+  - name: Get additional patches (fixes for multithreaded build)
+    shell: ./pull-patchset.sh {{ item.path }} {{ item.patchset }}
+    with_items:
+      - { path: controller, patchset: 34917 }
+      - { path: controller, patchset: 34918 }
+      - { path: controller, patchset: 34919 }
+      - { path: controller, patchset: 34920 }
+      - { path: controller, patchset: 34924 }
+      - { path: controller, patchset: 34986 }
+      - { path: controller, patchset: 35098 }
+      - { path: controller, patchset: 35469 }
+      - { path: tools/build, patchset: 34915 }
+      - { path: tools/build, patchset: 34916 }
+  - name: Create a symlink debian -> tools/packages/debian/contrail/debian/
+    shell: ln -s tools/packages/debian/contrail/debian/
+    args:
+      chdir: /home/ubuntu/contrail/
+      creates: /home/ubuntu/contrail/debian/
+  - name: install system dependencies for the contrail build using pbuilder
+    shell: mk-build-deps -i -r debian/control
+    args:
+      chdir: /home/ubuntu/contrail/
+    become: true
+    become_user: root
+
