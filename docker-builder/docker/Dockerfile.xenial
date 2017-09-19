@@ -1,0 +1,15 @@
+FROM ubuntu:xenial
+
+ENV PACKAGING_REPO https://github.com/kklimonda/contrail-packages.git
+
+ADD http://apt-mk.mirantis.com/public.gpg /tmp/public.gpg
+
+RUN echo 'deb http://apt-mk.mirantis.com/xenial/ nightly extra' > /etc/apt/sources.list.d/contrail.list && \
+    apt-key add /tmp/public.gpg && rm /tmp/public.gpg
+
+RUN apt-get update && \
+    apt-get install --assume-yes build-essential devscripts git equivs libtool-bin wget libglib2.0-dev && \
+    (cd /tmp/ && git clone ${PACKAGING_REPO} && \
+     mk-build-deps -i -r contrail-packages/debian/contrail/debian/control \
+         --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes") && \
+    rm -rf /var/lib/apt/archives/*
