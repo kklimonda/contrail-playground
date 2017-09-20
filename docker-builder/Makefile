@@ -5,6 +5,7 @@ DISTRO ?= ubuntu
 VERSION ?= 5.0
 JOBS ?= 25
 BUILD ?= debug
+IMAGE ?= contrail-builder:xenial
 
 bin:
 	mkdir bin
@@ -41,4 +42,7 @@ third_party: checkout
 docker:
 	cat docker/Dockerfile.${SERIES} | docker build -t contrail-builder:${VERSION}-${SERIES} -
 
-.PHONY: build docker
+package:
+	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/scripts/:/scripts -v `pwd`/target:/target -w /target ${IMAGE} bash -x /scripts/package.sh ${DISTRO} ${SERIES} ${CONTRAIL_VNC} ${BRANCH} ${VERSION} ${JOBS}
+
+.PHONY: build docker package

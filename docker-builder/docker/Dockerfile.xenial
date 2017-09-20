@@ -9,7 +9,8 @@ RUN echo 'deb http://apt-mk.mirantis.com/xenial/ nightly extra' > /etc/apt/sourc
 
 RUN apt-get update && \
     apt-get install --assume-yes build-essential devscripts git equivs libtool-bin wget libglib2.0-dev && \
+    apt-get install --assume-yes linux-headers-4.4.0-89-generic && \
     (cd /tmp/ && git clone ${PACKAGING_REPO} && \
      mk-build-deps -i -r contrail-packages/debian/contrail/debian/control \
          --tool="apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes") && \
-    rm -rf /var/lib/apt/archives/*
+    rm -rf /var/lib/apt/lists/*
