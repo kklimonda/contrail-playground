@@ -6,7 +6,8 @@ SERIES=$2
 CONTRAIL_VNC=$3
 BRANCH=$4
 VERSION=$5
-JOBS=$6
+KERNEL_DIR=$6
+JOBS=$7
 
 REPO=/tmp/contrail/bin/repo
 mkdir /tmp/contrail/{,bin,build}
@@ -27,6 +28,8 @@ $REPO sync
 function package_ubuntu()
 {
     export DEB_BUILD_OPTIONS="parallel=${JOBS}"
+    export KERNEL_DIR
+
     cd /tmp/contrail/build/
     cp -R tools/packages/debian/contrail/debian .
 

@@ -6,6 +6,7 @@ VERSION ?= 5.0
 JOBS ?= 25
 BUILD ?= debug
 IMAGE ?= contrail-builder:xenial
+KERNEL_DIR ?= /usr/src/linux-headers-4.4.0-89-generic
 
 bin:
 	mkdir bin
@@ -43,6 +44,6 @@ docker:
 	cat docker/Dockerfile.${SERIES} | docker build -t contrail-builder:${VERSION}-${SERIES} -
 
 package:
-	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/scripts/:/scripts -v `pwd`/target:/target -w /target ${IMAGE} bash -x /scripts/package.sh ${DISTRO} ${SERIES} ${CONTRAIL_VNC} ${BRANCH} ${VERSION} ${JOBS}
+	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/scripts/:/scripts -v `pwd`/target:/target -w /target ${IMAGE} bash -x /scripts/package.sh ${DISTRO} ${SERIES} ${CONTRAIL_VNC} ${BRANCH} ${VERSION} ${KERNEL_DIR} ${JOBS}
 
 .PHONY: build docker package
