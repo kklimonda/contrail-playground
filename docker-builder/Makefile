@@ -31,17 +31,17 @@ patch: checkout
 	touch patch
 
 build: patch third_party
-	docker run -u 1000:1000 -it -v `pwd`/src/:/src -v /lib/modules:/lib/modules -v /usr/src:/usr/src -w /src/ contrail-builder:${VERSION}-${SERIES} scons -j$(JOBS) --opt=$(BUILD) --root=/src/build/debian/tmp/
+	docker run -u 1000:1000 -it -v `pwd`/src/:/src -v /lib/modules:/lib/modules -v /usr/src:/usr/src -w /src/ ${IMAGE} scons -j$(JOBS) --opt=$(BUILD) --root=/src/build/debian/tmp/
 
 install:
-	docker run -u 1000:1000 -it -v `pwd`/src/:/src -v /lib/modules:/lib/modules -v /usr/src:/usr/src -w /src/ contrail-builder:${VERSION}-${SERIES} make -f debian/rules install
+	docker run -u 1000:1000 -it -v `pwd`/src/:/src -v /lib/modules:/lib/modules -v /usr/src:/usr/src -w /src/ ${IMAGE} make -f debian/rules install
 
 third_party: checkout
-	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/src/:/src -w /src/third_party/ contrail-builder:${VERSION}-${SERIES} python fetch_packages.py
+	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/src/:/src -w /src/third_party/ ${IMAGE} python fetch_packages.py
 	touch third_party
 
 docker:
-	cat docker/Dockerfile.${SERIES} | docker build -t contrail-builder:${VERSION}-${SERIES} -
+	cat docker/Dockerfile.${SERIES} | docker build -t ${IMAGE} -
 
 package:
 	docker run -u 1000:1000 -e USER=${USER} -it -v `pwd`/scripts/:/scripts -v `pwd`/target:/target -w /target ${IMAGE} bash -x /scripts/package.sh ${DISTRO} ${SERIES} ${CONTRAIL_VNC} ${BRANCH} ${VERSION} ${KERNEL_DIR} ${JOBS}

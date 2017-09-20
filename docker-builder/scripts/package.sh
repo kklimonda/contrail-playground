@@ -54,3 +54,4 @@ if [[ "$DISTRO" == "ubuntu" ]]; then
 fi
 
 ls -l /tmp/contrail/
+/bin/bash
