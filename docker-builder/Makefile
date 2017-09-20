@@ -5,7 +5,7 @@ DISTRO ?= ubuntu
 VERSION ?= 5.0
 JOBS ?= 25
 BUILD ?= debug
-IMAGE ?= contrail-builder:xenial
+IMAGE ?= contrail-builder:${VERSION}-${SERIES}
 KERNEL_DIR ?= /usr/src/linux-headers-4.4.0-89-generic
 
 bin:

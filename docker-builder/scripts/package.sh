@@ -28,7 +28,7 @@ $REPO sync
 function package_ubuntu()
 {
     export DEB_BUILD_OPTIONS="parallel=${JOBS}"
-    export KERNEL_DIR
+    export DEB_KERNEL_DIR="$KERNEL_DIR"
 
     cd /tmp/contrail/build/
     cp -R tools/packages/debian/contrail/debian .
@@ -51,5 +51,6 @@ fi
 if [[ "$DISTRO" == "ubuntu" ]]; then
     package_ubuntu
     mv /tmp/contrail/*.deb /target/
-    ls -l /tmp/contrail/
 fi
+
+ls -l /tmp/contrail/
