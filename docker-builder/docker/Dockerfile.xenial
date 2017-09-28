@@ -4,7 +4,7 @@ ENV PACKAGING_REPO https://github.com/kklimonda/contrail-packages.git
 
 ADD http://apt-mk.mirantis.com/public.gpg /tmp/public.gpg
 
-RUN echo 'deb http://apt-mk.mirantis.com/xenial/ nightly extra' > /etc/apt/sources.list.d/contrail.list && \
+RUN echo 'deb http://apt-mk.mirantis.com/xenial/ testing extra' > /etc/apt/sources.list.d/contrail.list && \
     apt-key add /tmp/public.gpg && rm /tmp/public.gpg
 
 RUN apt-get update && \
