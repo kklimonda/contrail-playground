@@ -40,7 +40,9 @@ function package_ubuntu()
     fi
 
     dch -v ${DEB_VERSION} -m "" && dch --release --distribution ${SERIES} -m "Releasing version ${DEB_VERSION}."
-    fakeroot debian/rules get-orig-source && mv contrail_${VERSION}.orig.tar.gz ../
+    fakeroot debian/rules get-orig-source
+    if [ ! -f contrail_${VERSION}.orig.tar.gz ]; then exit 1; fi
+    mv contrail_${VERSION}.orig.tar.gz ../
     debuild -us -uc -i 
 }
 
