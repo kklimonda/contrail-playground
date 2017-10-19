@@ -6,7 +6,7 @@
     become: true
     become_user: root
   - name: Add Mirantis MK dependencies repository
-    apt_repository: repo="deb http://apt-mk.mirantis.com/xenial/ nightly extra"
+    apt_repository: repo="deb http://apt-mk.mirantis.com/xenial/ testing extra"
     become: true
     become_user: root
   - name: Install base packages to support building
